@@ -22,22 +22,14 @@ A Flask-based RESTful API for retrieving, storing, and managing weather data.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/weather-api.git
+git https://github.com/amaankhanducs/Weather-app/tree/docker
 cd weather-api
 ```
-
-2. Create and activate a virtual environment (optional but recommended):
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
-4. Set up your environment variables (optional):
+3. Set up your environment variables (optional):
 ```bash
 export OPENWEATHERMAP_API_KEY='your_api_key_here'
 export DEBUG='True'  # Set to 'False' in production
@@ -53,7 +45,7 @@ Run the application:
 python app.py
 ```
 
-The API will be available at http://localhost:8000/
+The API will be available at http://192.168.8.37:8000/
 
 ### API Endpoints
 
@@ -201,4 +193,4 @@ Logs are output to the console by default.
 
 ## Contributors
 
-Your Name Mohd Amaan Khan
+Your Name : Mohd Amaan Khan
