@@ -1,7 +1,14 @@
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timedelta
+import logging
 from config import Config
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Initialize Flask and Config
 app = Flask(__name__)
@@ -24,7 +31,7 @@ class Weather(db.Model):
     wind_speed = db.Column(db.Float, nullable=False)
     wind_deg = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(100), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False)
     
     __table_args__ = (
         db.UniqueConstraint('city_name', 'language', name='unique_city_lang'),
@@ -35,7 +42,9 @@ class Weather(db.Model):
     
     def to_dict(self):
         return {
+            'id': self.id,
             'city': self.city_name,
+            'language': self.language,
             'temperature': {
                 'temp': self.temp,
                 'feels_like': self.feels_like,
@@ -48,15 +57,19 @@ class Weather(db.Model):
                 'speed': self.wind_speed,
                 'deg': self.wind_deg
             },
-            'description': self.description
+            'description': self.description,
+            'timestamp': self.timestamp.isoformat()
         }
 
-# Import routes after model definition
-from routes import *
+
 
 # Create the database if it doesn't exist
 with app.app_context():
     db.create_all()
+    logger.info("Database tables created or verified")
+# Import routes after model definition
+from routes import *
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    logger.info("Starting Weather API application")
+    app.run(host='0.0.0.0', port=8000, debug=Config.DEBUG)

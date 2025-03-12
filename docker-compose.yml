@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  weather-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - OPENWEATHERMAP_API_KEY=186316716709c31e9f17840d653a9eba
+      - DATABASE_URL=sqlite:///weather.db
+      - CACHE_TIMEOUT_MINUTES=30
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
