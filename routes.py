@@ -20,7 +20,8 @@ def home():
             'GET /': 'API information',
             'POST /': 'Get weather data with {"city_name": "city", "lang": "language_code"}',
             'DELETE /': 'Delete weather data with {"city_name": "city", "lang": "language_code"}',
-            'GET /cities': 'Get list of all cities in the database'
+            'GET /cities': 'Get list of all cities in the database',
+            'GET /cities/<id>': 'Get weather data for a specific city by ID'
         }
     }), HTTPStatus.OK
 
@@ -187,6 +188,35 @@ def get_cities():
     
     except Exception as e:
         logger.error(f"Unexpected error in get_cities: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route('/cities/<int:city_id>', methods=['GET'])
+def get_city_by_id(city_id):
+    """Get weather data for a specific city by ID."""
+    try:
+        logger.info(f"Fetching weather data for city with ID: {city_id}")
+        
+        # Find the weather data for the given ID
+        weather_data = Weather.query.get(city_id)
+        
+        if not weather_data:
+            logger.warning(f"Weather data not found for ID: {city_id}")
+            return jsonify({'error': f'No data found for city with ID: {city_id}'}), HTTPStatus.NOT_FOUND
+        
+        # Check if the data is fresh
+        time_difference = datetime.utcnow() - weather_data.timestamp
+        is_fresh = time_difference <= timedelta(minutes=app.config['CACHE_TIMEOUT_MINUTES'])
+        
+        # Return the weather data with freshness information
+        response_data = weather_data.to_dict()
+        response_data['is_fresh'] = is_fresh
+        response_data['last_updated'] = weather_data.timestamp.isoformat()
+        
+        logger.info(f"Successfully retrieved weather data for {weather_data.city_name}")
+        return jsonify(response_data), HTTPStatus.OK
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in get_city_by_id: {str(e)}")
         return jsonify({'error': 'Internal server error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.errorhandler(HTTPStatus.NOT_FOUND)
