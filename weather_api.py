@@ -34,10 +34,10 @@ def fetch_weather_data(city_name, lang='en'):
         else:
             logger.error(f"Error fetching data for {city_name}: HTTP {response.status_code}")
             logger.debug(f"API response: {response.text}")
-            return HTTPStatus.INTERNAL_SERVER_ERROR
+            return {"error": "Server Error", "status": HTTPStatus.INTERNAL_SERVER_ERROR}
     except requests.RequestException as e:
         logger.error(f"Request exception while fetching data for {city_name}: {str(e)}")
-        return HTTPStatus.INTERNAL_SERVER_ERROR
+        return {"error": "Server Error", "status": HTTPStatus.INTERNAL_SERVER_ERROR}
     except Exception as e:
         logger.error(f"Unexpected exception while fetching data for {city_name}: {str(e)}")
-        return HTTPStatus.INTERNAL_SERVER_ERROR
+        return {"error": "Server Error", "status": HTTPStatus.INTERNAL_SERVER_ERROR}
